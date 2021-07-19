@@ -92,7 +92,7 @@ func TestCopySameStructWithPointerFieldTag(t *testing.T) {
 	user := &UserTag{Birthday: &currentTime, Name: "Jinzhu", Nickname: "jinzhu", Age: 18, FakeAge: &fakeAge,
 		Role: "Admin", Notes: []string{"hello world", "welcome"}, flags: []byte{'x'}}
 	newUser := &UserTag{}
-	copystruct.CopyByTag(newUser, user, "mson")
+	copystruct.CopyStructTag(newUser, user, "mson")
 	if user.Birthday == newUser.Birthday {
 		t.Errorf("TestCopySameStructWithPointerField: copy Birthday failed since they need to have different address")
 	}
@@ -120,24 +120,24 @@ func TestCopyStructTag(t *testing.T) {
 		Notes: []string{"hello world", "welcome"}, flags: []byte{'x'}}
 	employee := EmployeeTag{}
 
-	if err := copystruct.CopyByTag(employee, &user, "mson"); err == nil {
+	if err := copystruct.CopyStructTag(employee, &user, "mson"); err == nil {
 		t.Errorf("Copy to unaddressable value should get error")
 	}
 
-	copystruct.CopyByTag(&employee, &user, "mson")
+	copystruct.CopyStructTag(&employee, &user, "mson")
 	checkEmployeeTag(employee, user, t, "Copy From Ptr To Ptr")
 
 	employee2 := EmployeeTag{}
-	copystruct.CopyByTag(&employee2, user, "mson")
+	copystruct.CopyStructTag(&employee2, user, "mson")
 	checkEmployeeTag(employee2, user, t, "Copy From Struct To Ptr")
 
 	employee3 := EmployeeTag{}
 	ptrToUser := &user
-	copystruct.CopyByTag(&employee3, &ptrToUser, "mson")
+	copystruct.CopyStructTag(&employee3, &ptrToUser, "mson")
 	checkEmployeeTag(employee3, user, t, "Copy From Double Ptr To Ptr")
 
 	employee4 := &EmployeeTag{}
-	copystruct.CopyByTag(&employee4, user, "mson")
+	copystruct.CopyStructTag(&employee4, user, "mson")
 	checkEmployeeTag(*employee4, user, t, "Copy From Ptr To Double Ptr")
 }
 
@@ -145,32 +145,32 @@ func TestCopyFromStructToSliceTag(t *testing.T) {
 	user := UserTag{Name: "Jinzhu", Age: 18, Role: "Admin", Notes: []string{"hello world"}}
 	employees := []EmployeeTag{}
 
-	if err := copystruct.CopyByTag(employees, &user, "mson"); err != nil && len(employees) != 0 {
+	if err := copystruct.CopyStructTag(employees, &user, "mson"); err != nil && len(employees) != 0 {
 		t.Errorf("Copy to unaddressable value should get error")
 	}
 
-	if copystruct.CopyByTag(&employees, &user, "mson"); len(employees) != 1 {
+	if copystruct.CopyStructTag(&employees, &user, "mson"); len(employees) != 1 {
 		t.Errorf("Should only have one elem when copy struct to slice")
 	} else {
 		checkEmployeeTag(employees[0], user, t, "Copy From Struct To Slice Ptr")
 	}
 
 	employees2 := &[]EmployeeTag{}
-	if copystruct.CopyByTag(&employees2, user, "mson"); len(*employees2) != 1 {
+	if copystruct.CopyStructTag(&employees2, user, "mson"); len(*employees2) != 1 {
 		t.Errorf("Should only have one elem when copy struct to slice")
 	} else {
 		checkEmployeeTag((*employees2)[0], user, t, "Copy From Struct To Double Slice Ptr")
 	}
 
 	employees3 := []*EmployeeTag{}
-	if copystruct.CopyByTag(&employees3, user, "mson"); len(employees3) != 1 {
+	if copystruct.CopyStructTag(&employees3, user, "mson"); len(employees3) != 1 {
 		t.Errorf("Should only have one elem when copy struct to slice")
 	} else {
 		checkEmployeeTag(*(employees3[0]), user, t, "Copy From Struct To Ptr Slice Ptr")
 	}
 
 	employees4 := &[]*EmployeeTag{}
-	if copystruct.CopyByTag(&employees4, user, "mson"); len(*employees4) != 1 {
+	if copystruct.CopyStructTag(&employees4, user, "mson"); len(*employees4) != 1 {
 		t.Errorf("Should only have one elem when copy struct to slice")
 	} else {
 		checkEmployeeTag(*((*employees4)[0]), user, t, "Copy From Struct To Double Ptr Slice Ptr")
@@ -182,7 +182,7 @@ func TestCopyFromSliceToSliceTag(t *testing.T) {
 		UserTag{Name: "Jinzhu2", Age: 22, Role: "Dev", Notes: []string{"hello world", "hello"}}}
 	employees := []EmployeeTag{}
 
-	if copystruct.CopyByTag(&employees, users, "mson"); len(employees) != 2 {
+	if copystruct.CopyStructTag(&employees, users, "mson"); len(employees) != 2 {
 		t.Errorf("Should have two elems when copy slice to slice")
 	} else {
 		checkEmployeeTag(employees[0], users[0], t, "Copy From Slice To Slice Ptr @ 1")
@@ -190,7 +190,7 @@ func TestCopyFromSliceToSliceTag(t *testing.T) {
 	}
 
 	employees2 := &[]EmployeeTag{}
-	if copystruct.CopyByTag(&employees2, &users, "mson"); len(*employees2) != 2 {
+	if copystruct.CopyStructTag(&employees2, &users, "mson"); len(*employees2) != 2 {
 		t.Errorf("Should have two elems when copy slice to slice")
 	} else {
 		checkEmployeeTag((*employees2)[0], users[0], t, "Copy From Slice Ptr To Double Slice Ptr @ 1")
@@ -198,7 +198,7 @@ func TestCopyFromSliceToSliceTag(t *testing.T) {
 	}
 
 	employees3 := []*EmployeeTag{}
-	if copystruct.CopyByTag(&employees3, users, "mson"); len(employees3) != 2 {
+	if copystruct.CopyStructTag(&employees3, users, "mson"); len(employees3) != 2 {
 		t.Errorf("Should have two elems when copy slice to slice")
 	} else {
 		checkEmployeeTag(*(employees3[0]), users[0], t, "Copy From Slice To Ptr Slice Ptr @ 1")
@@ -206,7 +206,7 @@ func TestCopyFromSliceToSliceTag(t *testing.T) {
 	}
 
 	employees4 := &[]*EmployeeTag{}
-	if copystruct.CopyByTag(&employees4, users, "mson"); len(*employees4) != 2 {
+	if copystruct.CopyStructTag(&employees4, users, "mson"); len(*employees4) != 2 {
 		t.Errorf("Should have two elems when copy slice to slice")
 	} else {
 		checkEmployeeTag(*((*employees4)[0]), users[0], t, "Copy From Slice Ptr To Double Ptr Slice Ptr @ 1")
@@ -218,7 +218,7 @@ func TestCopyFromSliceToSliceTag2(t *testing.T) {
 	users := []*UserTag{{Name: "Jinzhu", Age: 18, Role: "Admin", Notes: []string{"hello world"}}, nil}
 	employees := []EmployeeTag{}
 
-	if copystruct.CopyByTag(&employees, users, "mson"); len(employees) != 2 {
+	if copystruct.CopyStructTag(&employees, users, "mson"); len(employees) != 2 {
 		t.Errorf("Should have two elems when copy slice to slice")
 	} else {
 		checkEmployeeTag2(employees[0], users[0], t, "Copy From Slice To Slice Ptr @ 1")
@@ -226,7 +226,7 @@ func TestCopyFromSliceToSliceTag2(t *testing.T) {
 	}
 
 	employees2 := &[]EmployeeTag{}
-	if copystruct.CopyByTag(&employees2, &users, "mson"); len(*employees2) != 2 {
+	if copystruct.CopyStructTag(&employees2, &users, "mson"); len(*employees2) != 2 {
 		t.Errorf("Should have two elems when copy slice to slice")
 	} else {
 		checkEmployeeTag2((*employees2)[0], users[0], t, "Copy From Slice Ptr To Double Slice Ptr @ 1")
@@ -234,7 +234,7 @@ func TestCopyFromSliceToSliceTag2(t *testing.T) {
 	}
 
 	employees3 := []*EmployeeTag{}
-	if copystruct.CopyByTag(&employees3, users, "mson"); len(employees3) != 2 {
+	if copystruct.CopyStructTag(&employees3, users, "mson"); len(employees3) != 2 {
 		t.Errorf("Should have two elems when copy slice to slice")
 	} else {
 		checkEmployeeTag2(*(employees3[0]), users[0], t, "Copy From Slice To Ptr Slice Ptr @ 1")
@@ -242,7 +242,7 @@ func TestCopyFromSliceToSliceTag2(t *testing.T) {
 	}
 
 	employees4 := &[]*EmployeeTag{}
-	if copystruct.CopyByTag(&employees4, users, "mson"); len(*employees4) != 2 {
+	if copystruct.CopyStructTag(&employees4, users, "mson"); len(*employees4) != 2 {
 		t.Errorf("Should have two elems when copy slice to slice")
 	} else {
 		checkEmployeeTag2(*((*employees4)[0]), users[0], t, "Copy From Slice Ptr To Double Ptr Slice Ptr @ 1")
@@ -275,7 +275,7 @@ func TestEmbeddedAndBaseTag(t *testing.T) {
 	}
 	embeded.User = &user
 
-	copystruct.CopyByTag(&base, &embeded, "mson")
+	copystruct.CopyStructTag(&base, &embeded, "mson")
 
 	if base.BaseField1 != 1 || base.User.Name != "testName" {
 		t.Error("Embedded fields not copied")
@@ -288,7 +288,7 @@ func TestEmbeddedAndBaseTag(t *testing.T) {
 	}
 	base.User = &user1
 
-	copystruct.CopyByTag(&embeded, &base, "mson")
+	copystruct.CopyStructTag(&embeded, &base, "mson")
 
 	if embeded.BaseField1 != 11 || embeded.User.Name != "testName1" {
 		t.Error("base fields not copied")
@@ -316,7 +316,7 @@ func (s *structSameName2Tag) B_int64(B int64) {
 func TestCopyFieldsWithSameNameButDifferentTypesTag(t *testing.T) {
 	obj1 := structSameName1Tag{A: "123", B: 2, C: time.Now()}
 	obj2 := &structSameName2Tag{}
-	err := copystruct.CopyByTag(obj2, &obj1, "mson")
+	err := copystruct.CopyStructTag(obj2, &obj1, "mson")
 	if err != nil {
 		t.Error("Should not raise error")
 	}
@@ -357,7 +357,7 @@ func TestScannerTag(t *testing.T) {
 
 	s2 := &ScannerStructToTag{}
 
-	err := copystruct.CopyByTag(s2, s, "mson")
+	err := copystruct.CopyStructTag(s2, s, "mson")
 	if err != nil {
 		t.Error("Should not raise error")
 	}

@@ -12,7 +12,7 @@ func BenchmarkCopyStructTag(b *testing.B) {
 	user := UserTag{Name: "Jinzhu", Nickname: "jinzhu", Age: 18, FakeAge: &fakeAge, Role: "Admin",
 		Notes: []string{"hello world", "welcome"}, flags: []byte{'x'}}
 	for x := 0; x < b.N; x++ {
-		copystruct.CopyByTag(&EmployeeTag{}, &user, "mson")
+		copystruct.CopyStructTag(&EmployeeTag{}, &user, "mson")
 	}
 }
 

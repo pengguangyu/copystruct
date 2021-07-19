@@ -49,7 +49,7 @@ func TestCopyDifferentFieldType(t *testing.T) {
 	}
 	ts2 := &TypeStruct2{}
 
-	copystruct.Copy(ts2, ts)
+	copystruct.CopyStruct(ts2, ts)
 
 	if ts2.Field2 != ts.Field2 || ts2.Field1 != 0 {
 		t.Errorf("Should be able to copy from ts to ts2")
@@ -63,7 +63,7 @@ func TestCopyDifferentTypeMethod(t *testing.T) {
 	}
 	ts4 := &TypeStruct4{}
 
-	copystruct.Copy(ts4, ts)
+	copystruct.CopyStruct(ts4, ts)
 
 	if ts4.Field2 != ts.Field2 || ts4.field1 != 0 {
 		t.Errorf("Should be able to copy from ts to ts4")
@@ -104,7 +104,7 @@ func TestAssignableType(t *testing.T) {
 
 	ts3 := &TypeStruct3{}
 
-	copystruct.Copy(&ts3, &ts)
+	copystruct.CopyStruct(&ts3, &ts)
 
 	if v, ok := ts3.Field1.(string); !ok {
 		t.Error("Assign to interface{} type did not succeed")
