@@ -1,3 +1,3 @@
-module other/copystruct
+module copystruct
 
 go 1.15
